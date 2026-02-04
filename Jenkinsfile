@@ -1,30 +1,40 @@
 pipeline {
     agent any
+
     options {
         skipStagesAfterUnstable()
     }
+
     stages {
+
         stage('Build') {
             steps {
-                bat 'python3 -m py_compile sources\\add2vals.py sources\\calc.py'
+                // Compile Python files
+                bat 'py -m py_compile sources\\add2vals.py sources\\calc.py'
             }
         }
+
         stage('Test') {
             steps {
-                bat 'pytest --verbose --junit-xml=test-reports\\results.xml sources\\test_calc.py'
+                // Run unit tests
+                bat 'py -m pytest --verbose --junit-xml=test-reports\\results.xml sources\\test_calc.py'
             }
             post {
                 always {
-                    junit 'test-reports/results.xml'
+                    // Publish test results
+                    junit 'test-reports\\results.xml'
                 }
             }
         }
+
         stage('Deliver') {
             steps {
-                bat 'pyinstaller --onefile sources\\add2vals.py'
+                // Create Windows executable
+                bat 'py -m PyInstaller --onefile sources\\add2vals.py'
             }
             post {
                 success {
+                    // Archive the generated .exe
                     archiveArtifacts artifacts: 'dist\\add2vals.exe', fingerprint: true
                 }
             }
