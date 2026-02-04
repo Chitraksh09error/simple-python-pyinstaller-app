@@ -6,12 +6,12 @@ pipeline {
     stages {
         stage('Build') {
             steps {
-                bat 'python -m py_compile sources/add2vals.py sources/calc.py'
+                bat 'python -m py_compile sources\\add2vals.py sources\\calc.py'
             }
         }
         stage('Test') {
             steps {
-                bat 'pytest --verbose --junit-xml test-reports/results.xml sources/test_calc.py'
+                bat 'pytest --verbose --junit-xml=test-reports\\results.xml sources\\test_calc.py'
             }
             post {
                 always {
@@ -25,7 +25,7 @@ pipeline {
             }
             post {
                 success {
-                    archiveArtifacts 'dist\\add2vals.exe'
+                    archiveArtifacts artifacts: 'dist\\add2vals.exe', fingerprint: true
                 }
             }
         }
